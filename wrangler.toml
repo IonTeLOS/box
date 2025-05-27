@@ -1,6 +1,7 @@
 name = "mailbox-worker"
 main = "src/index.js"
 compatibility_date = "2025-05-27"
+account_id         = "e10a413c33d006b7a7a6438cd9fb5ab2"
 
 [vars]
 SYSTEM_SECRET = "123456"
