@@ -1,0 +1,21 @@
+name = "mailbox-worker"
+main = "src/index.js"
+compatibility_date = "2025-05-27"
+
+[vars]
+SYSTEM_SECRET = "123456"
+POLY_RPC_URL   = "https://polygon-rpc.com"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Mailbox"]
+
+[durable_objects]
+bindings = [
+  { name = "MAILBOX", class_name = "Mailbox" }
+]
+
+# Correct R2 syntax: array of tables
+[[r2_buckets]]
+binding    = "PAYLOAD_BUCKET"
+bucket_name = "mailbox-payloads"

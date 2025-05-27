@@ -1,0 +1,28 @@
+{
+  "name": "Edge Inbox-Outbox",
+  "description": "One-click encrypted messaging node",
+  "version": "1.0.0",
+  "template_type": "workers",
+  "compatibility_date": "2025-05-27",
+  "bindings": {
+    "durable_objects": [
+      { "name": "MAILBOX", "class": "Mailbox" }
+    ],
+    "r2_buckets": [
+      { "binding": "PAYLOAD_BUCKET", "bucket_name": "mailbox-payloads" }
+    ],
+    "vars": [
+      {
+        "name": "SYSTEM_SECRET",
+        "type": "secret_text",
+        "help": "Random JWT signing key",
+        "default": ""
+      },
+      {
+        "name": "POLY_RPC_URL",
+        "type": "secret_text",
+        "default": "https://polygon-rpc.com"
+      }
+    ]
+  }
+}
