@@ -1,0 +1,11 @@
+{
+  "name": "box",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@cloudflare/wrangler": "^4.17.0"
+  }
+}
