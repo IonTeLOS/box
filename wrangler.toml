@@ -1,22 +1,18 @@
 name = "mailbox-worker"
 main = "src/index.js"
 compatibility_date = "2025-05-27"
-account_id         = "e10a413c33d006b7a7a6438cd9fb5ab2"
 
 [vars]
-SYSTEM_SECRET = "123456"
-POLY_RPC_URL   = "https://polygon-rpc.com"
+POLY_RPC_URL = "https://polygon-rpc.com"
 
-[[migrations]]
-tag = "v1"
-new_classes = ["Mailbox"]
-
+# === Durable Object binding (single table) ===
 [durable_objects]
 bindings = [
-  { name = "MAILBOX", class_name = "Mailbox" }
+  { name = "MAILBOX", class_name = "Mailbox" },
+  { name = "ROOM",    class_name = "Mailbox" }
 ]
 
-# Correct R2 syntax: array of tables
-[[r2_buckets]]
-binding    = "PAYLOAD_BUCKET"
-bucket_name = "mailbox-payloads"
+# === Migration to create your DO class ===
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Mailbox"]
