@@ -1,35 +1,37 @@
-// src/index.js
-// Entrypoint for the Cloudflare Worker routing to the Mailbox Durable Object
+import { Mailbox } from './mailbox.js';
 
-import { Mailbox } from './mailbox';
-
-// Export the Durable Object class so Wrangler can register it
+// **export your DO class** so Wrangler knows about it
 export { Mailbox };
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const [, resource, ownerId] = url.pathname.split('/');
+    const parts = url.pathname.split('/');
+    const type = parts[1];       // "mailbox" or "room"
+    const id   = parts[2];
+    let ns, stub;
 
-    // Route requests under /mailbox/:ownerId/* to the Durable Object
-    if (resource === 'mailbox' && ownerId) {
-      // Generate a deterministic ID for this owner
-      const id = env.MAILBOX.idFromName(ownerId);
-      const stub = env.MAILBOX.get(id);
-      // Attach ownerId header for the DO
-      const modifiedHeaders = new Headers(request.headers);
-      modifiedHeaders.set('X-Owner-Id', ownerId);
-      const newRequest = new Request(request.url, {
-        method: request.method,
-        headers: modifiedHeaders,
-        body: ['GET','HEAD'].includes(request.method) ? undefined : request.body,
-        redirect: request.redirect
-      });
-      // Forward the modified request to the DO
-      return stub.fetch(newRequest, env);
+    if (type === 'mailbox') {
+      ns   = env.MAILBOX;
+      stub = ns.get(ns.idFromName(id));
+    } else if (type === 'room') {
+      ns   = env.ROOM;
+      stub = ns.get(ns.idFromName(id));
+    } else {
+      return new Response('Not Found', { status: 404 });
     }
 
-    // No matching route: 404
-    return new Response('Not Found', { status: 404 });
+    // Forward the X-Owner-Id or X-Room-Id
+    const headers = new Headers(request.headers);
+    headers.set(type === 'mailbox' ? 'X-Owner-Id' : 'X-Room-Id', id);
+
+    const forwarded = new Request(request.url, {
+      method:  request.method,
+      headers,
+      body:    ['GET','HEAD'].includes(request.method) ? undefined : request.body,
+      redirect: request.redirect,
+    });
+
+    return stub.fetch(forwarded, env);
   }
 };
